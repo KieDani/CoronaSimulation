@@ -163,7 +163,7 @@ def timestep(population):
 def main():
     #initial values
     U = 0.3
-    t = 0.3
+    t = 0.1
     V = 0.03
     np.random.seed(42)
     graphSizeX = 30

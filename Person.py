@@ -9,6 +9,7 @@ class Person:
         self.infected = False
         self.timeInfected = 0
         self.immune = False
+        self.durationSickness = 20
 
 
     def getPos(self):
@@ -28,4 +29,14 @@ class Person:
         return self.infected
 
     def infect(self):
-        self.infected = True
+        if(self.immune == False):
+            self.infected = True
+
+    def timeStep(self):
+        if(self.infected == True):
+            self.timeInfected += 1
+
+        if(self.timeInfected > 20):
+            self.infected = False
+            self.immune = True
+

@@ -62,7 +62,7 @@ def move(person, population, positionArray, t, U, graphSizeX, graphSizeY, positi
     statePositionArray = positionArray[xPos, yPos]
     if(statePositionArray != 0):
         r2 = np.random.rand()
-        if(r2 < U):
+        if(r2 > U):
             if(statePositionArray < 0):
                 person.infect()
             else:
@@ -101,15 +101,18 @@ def calculateNumberInfected(population):
             numInfected += 1
     return numInfected
 
+def timestep(population):
+    for ind in population:
+        ind.timeStep()
 
 
 def main():
     #initial values
-    U = 0.5
-    t = 0.5
+    U = 0.2
+    t = 0.6
     np.random.seed(42)
-    graphSizeX = 50
-    graphSizeY = 50
+    graphSizeX = 30
+    graphSizeY = 30
     population = list()
     numPop = 500
     numInfected = 3
@@ -144,6 +147,7 @@ def main():
     print(positionArray)
     for j in range(100):
         print(j)
+        timestep(population=population)
         for ind in population:
             # this makes everything quadratic :(
             positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)

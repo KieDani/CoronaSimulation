@@ -21,7 +21,9 @@ def initializeInfection(numInfected, population):
 
 
 
-def indexToPosition(index, graphSizeX):
+def indexToPosition(index, graphSizeX, graphSizeY):
+    if(index == graphSizeX * graphSizeY):
+        return graphSizeX, graphSizeY
     xPos = index % graphSizeX
     yPos = (index - xPos) / graphSizeX
     return xPos, yPos
@@ -31,6 +33,9 @@ def buildPositionArray(population, graphSizeX, graphSizeY):
     positionArray = np.zeros((graphSizeX, graphSizeY), dtype=np.int8)
     for ind in population:
         xPos, yPos = ind.getPos()
+        # skip impurity
+        if(xPos == graphSizeX and yPos == graphSizeY):
+            continue
         if(ind.isInfected() == True):
             positionArray[xPos, yPos] -= 1
         else:
@@ -38,61 +43,110 @@ def buildPositionArray(population, graphSizeX, graphSizeY):
     return positionArray
 
 
-def move(person, population, positionArray, t, U, graphSizeX, graphSizeY, positionToID):
-    teff = t/4.
-    xPos, yPos = person.getPos()
-    oldX = xPos
-    oldY = yPos
+def move(person, population, positionArray, t, U, V, graphSizeX, graphSizeY, positionToID):
     r = np.random.rand()
-    if(r < teff):
-        xPos +=1
-    elif(r < 2*teff):
-        xPos -= 1
-    elif(r < 3* teff):
-        yPos +=1
-    elif(r < 4*teff):
-        yPos -= 1
-    else:
-        #no change
-        return
-
-    yPos = yPos % graphSizeY
-    xPos = xPos % graphSizeX
-
-    statePositionArray = positionArray[xPos, yPos]
-    if(statePositionArray != 0):
-        r2 = np.random.rand()
-        if(r2 > U):
-            if(statePositionArray < 0):
-                person.infect()
-            else:
+    r2 = np.random.rand()
+    # jump from impurity/supermarket
+    if(person.atImpurity == True):
+        if(r >= t and r < V+t):
+            #oldX, oldY = person.getPos()
+            xPos = np.random.randint(graphSizeX)
+            yPos = np.random.randint(graphSizeY)
+            #if new place is empty or people do not reject
+            if(r2 > U or len(positionToID[yPos*graphSizeX + xPos])  == 0):
+                positionToID[graphSizeY*graphSizeX].remove(person.getID())
+                positionToID[yPos*graphSizeX + xPos].append(person.id)
+                #infect other people
                 if(person.isInfected() == True):
                     for member in positionToID[yPos*graphSizeX + xPos]:
                         population[member].infect()
+                #get infected
+                else:
+                    for member in positionToID[yPos * graphSizeX + xPos]:
+                        if(population[member].isInfected() == True):
+                            person.infect()
+                            break
+                person.jumpFromImpurity(xPos=xPos, yPos=yPos)
+    # jump to the impurity/supermarket
+    elif(r >= t and r < V+t):
+        oldX, oldY = person.getPos()
+        if (r2 > U or len(positionToID[graphSizeY * graphSizeX]) == 0):
+            positionToID[oldY * graphSizeX + oldX].remove(person.getID())
+            positionToID[graphSizeY * graphSizeX].append(person.id)
+            # infect other people
+            if (person.isInfected() == True):
+                for member in positionToID[graphSizeY * graphSizeX]:
+                    population[member].infect()
+            # get infected
+            else:
+                for member in positionToID[graphSizeY * graphSizeX]:
+                    if (population[member].isInfected() == True):
+                        person.infect()
+                        break
+            person.jumpToImpurity()
+
+        pass
+    # jump around on lattice
+    else:
+        teff = t/4.
+        xPos, yPos = person.getPos()
+        oldX = xPos
+        oldY = yPos
+        if(r < teff):
+            xPos +=1
+        elif(r < 2*teff):
+            xPos -= 1
+        elif(r < 3* teff):
+            yPos +=1
+        elif(r < 4*teff):
+            yPos -= 1
         else:
-            xPos = oldX
-            yPos = oldY
+            #no change
+            return
+
+        yPos = yPos % graphSizeY
+        xPos = xPos % graphSizeX
+
+        statePositionArray = positionArray[xPos, yPos]
+        positionList = positionToID[yPos*graphSizeX + xPos]
+        #if lattice site is not empty
+        if(len(positionList) != 0):
+            #if jump is not rejected
+            if(r2 > U):
+                # infect other people
+                if (person.isInfected() == True):
+                    for member in positionToID[yPos * graphSizeX + xPos]:
+                        population[member].infect()
+                # get infected
+                else:
+                    for member in positionToID[yPos * graphSizeX + xPos]:
+                        if (population[member].isInfected() == True):
+                            person.infect()
+                            break
+            #if jump is rejected
+            else:
+                xPos = oldX
+                yPos = oldY
 
 
-    person.setPos(xPos=xPos, yPos=yPos)
-    # if (statePositionArray < 0):
-    #     positionArray[xPos, yPos] -= 1
-    # else:
-    #     if(person.isInfected() == True):
-    #         positionArray[xPos, yPos] -= 1
-    #     else:
-    #         positionArray[xPos, yPos] += 1
-    #
-    # if (positionArray[oldX, oldY] < 0):
-    #     positionArray[oldX, oldY] += 1
-    # else:
-    #     positionArray[oldX, oldY] -= 1
+        person.setPos(xPos=xPos, yPos=yPos)
+        # if (statePositionArray < 0):
+        #     positionArray[xPos, yPos] -= 1
+        # else:
+        #     if(person.isInfected() == True):
+        #         positionArray[xPos, yPos] -= 1
+        #     else:
+        #         positionArray[xPos, yPos] += 1
+        #
+        # if (positionArray[oldX, oldY] < 0):
+        #     positionArray[oldX, oldY] += 1
+        # else:
+        #     positionArray[oldX, oldY] -= 1
 
-    id = person.getID()
-    positionToID[oldY * graphSizeX + oldX].remove(id)
-    positionToID[yPos * graphSizeX + xPos].append(id)
+        id = person.getID()
+        positionToID[oldY * graphSizeX + oldX].remove(id)
+        positionToID[yPos * graphSizeX + xPos].append(id)
 
-    #person.setPos(xPos=xPos, yPos=yPos)
 
 def calculateNumberInfected(population):
     numInfected = 0
@@ -108,8 +162,9 @@ def timestep(population):
 
 def main():
     #initial values
-    U = 0.2
-    t = 0.6
+    U = 0.3
+    t = 0.3
+    V = 0.03
     np.random.seed(42)
     graphSizeX = 30
     graphSizeY = 30
@@ -124,6 +179,7 @@ def main():
     # initialize positionToID with empty lists
     for i in range(graphSizeX * graphSizeY):
         positionToID.append(list())
+    positionToID.append(list())
 
 
     #put persons into lattice
@@ -131,7 +187,7 @@ def main():
         positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
         pos = initializePosition(population=population, positionArray=positionArray, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
         # positionArray[pos[0], pos[1]] += 1
-        population.append(P.Person(id=id, xPos=pos[0], yPos=pos[1]))
+        population.append(P.Person(id=id, xPos=pos[0], yPos=pos[1], graphSizeX=graphSizeX, graphSizeY=graphSizeY))
         positionToID[pos[1] * graphSizeX + pos[0]].append(id)
 
 
@@ -151,7 +207,7 @@ def main():
         for ind in population:
             # this makes everything quadratic :(
             positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
-            move(person=ind, population=population, positionArray=positionArray, t=t, U=U, graphSizeX=graphSizeX, graphSizeY=graphSizeY,
+            move(person=ind, population=population, positionArray=positionArray, t=t, U=U, V=V, graphSizeX=graphSizeX, graphSizeY=graphSizeY,
                  positionToID=positionToID)
         numInfected = calculateNumberInfected(population=population)
         arrayInfected.append(numInfected)

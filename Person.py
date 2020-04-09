@@ -2,7 +2,7 @@ from numba import jit
 
 class Person:
 
-    def __init__(self, id, xPos, yPos):
+    def __init__(self, id, xPos, yPos, graphSizeX, graphSizeY):
         self.id = id
         self.xPos = xPos
         self.yPos = yPos
@@ -10,6 +10,9 @@ class Person:
         self.timeInfected = 0
         self.immune = False
         self.durationSickness = 20
+        self.atImpurity = False
+        self.graphSizeX = graphSizeX
+        self.graphSizeY = graphSizeY
 
 
     def getPos(self):
@@ -40,3 +43,12 @@ class Person:
             self.infected = False
             self.immune = True
 
+    def jumpToImpurity(self):
+        self.atImpurity = True
+        self.xPos = self.graphSizeX
+        self.yPos = self.graphSizeY
+
+    def jumpFromImpurity(self, xPos, yPos):
+        self.xPos = xPos
+        self.yPos = yPos
+        self.atImpurity = False

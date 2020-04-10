@@ -167,7 +167,8 @@ def simulation(U, t, V, n):
     graphSizeX = 100
     graphSizeY = 100
     population = list()
-    numPop = 2500
+    numPop = 2000
+    lengthOfDay = 4
     numInfected = int(np.ceil(n * numPop))
     # 0...empty, 1...taken once, -1...infected
     # positionArray = np.zeros((graphSizeX, graphSizeY), dtype=np.int8)
@@ -199,12 +200,13 @@ def simulation(U, t, V, n):
     #print(positionToID)
     #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
     #print(positionArray)
-    for j in range(100):
+    for j in range(60):
         print(j)
         timestep(population=population)
-        for ind in population:
-            move(person=ind, population=population, t=t, U=U, V=V, graphSizeX=graphSizeX, graphSizeY=graphSizeY,
-                 positionToID=positionToID)
+        for i in range(lengthOfDay):
+            for ind in population:
+                move(person=ind, population=population, t=t, U=U, V=V, graphSizeX=graphSizeX, graphSizeY=graphSizeY,
+                     positionToID=positionToID)
         numInfected = calculateNumberInfected(population=population)
         arrayInfected.append(numInfected)
     #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
@@ -222,16 +224,19 @@ def simulation(U, t, V, n):
 
 
 def main():
-    U = 0.3
-    t = 0.2
-    V = 0.06
+    U = 0.5
+    t = 0.01
+    V = 0.005
     np.random.seed(42)
     graphSizeX = 30
     graphSizeY = 30
     population = list()
     numPop = 500
     numInfected = 3
-    simulation(U=U, t=t, V=V, n=0.01)
+    arrayInfected = simulation(U=U, t=t, V=V, n=0.01)
+    plt.plot(arrayInfected)
+    plt.show()
+
 
 
 

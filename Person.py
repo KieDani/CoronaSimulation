@@ -9,7 +9,7 @@ class Person:
         self.infected = False
         self.timeInfected = 0
         self.immune = False
-        self.durationSickness = 20
+        self.durationSickness = 14
         self.atImpurity = False
         self.graphSizeX = graphSizeX
         self.graphSizeY = graphSizeY

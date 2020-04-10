@@ -43,7 +43,7 @@ def buildPositionArray(population, graphSizeX, graphSizeY):
     return positionArray
 
 
-def move(person, population, positionArray, t, U, V, graphSizeX, graphSizeY, positionToID):
+def move(person, population, t, U, V, graphSizeX, graphSizeY, positionToID):
     r = np.random.rand()
     r2 = np.random.rand()
     # jump from impurity/supermarket
@@ -107,7 +107,7 @@ def move(person, population, positionArray, t, U, V, graphSizeX, graphSizeY, pos
         yPos = yPos % graphSizeY
         xPos = xPos % graphSizeX
 
-        statePositionArray = positionArray[xPos, yPos]
+        #statePositionArray = positionArray[xPos, yPos]
         positionList = positionToID[yPos*graphSizeX + xPos]
         #if lattice site is not empty
         if(len(positionList) != 0):
@@ -160,17 +160,15 @@ def timestep(population):
         ind.timeStep()
 
 
-def main():
+#n...initially infected persons per population
+def simulation(U, t, V, n):
     #initial values
-    U = 0.3
-    t = 0.1
-    V = 0.03
     np.random.seed(42)
-    graphSizeX = 30
-    graphSizeY = 30
+    graphSizeX = 100
+    graphSizeY = 100
     population = list()
-    numPop = 500
-    numInfected = 3
+    numPop = 2500
+    numInfected = int(np.ceil(n * numPop))
     # 0...empty, 1...taken once, -1...infected
     # positionArray = np.zeros((graphSizeX, graphSizeY), dtype=np.int8)
     # If person is at (x,y), put it in list at position y*graphsizeX + x
@@ -198,27 +196,42 @@ def main():
     #move the people around
     arrayInfected = list()
     arrayInfected.append(numInfected)
-    print(positionToID)
-    positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
-    print(positionArray)
+    #print(positionToID)
+    #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
+    #print(positionArray)
     for j in range(100):
         print(j)
         timestep(population=population)
         for ind in population:
-            # this makes everything quadratic :(
-            positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
-            move(person=ind, population=population, positionArray=positionArray, t=t, U=U, V=V, graphSizeX=graphSizeX, graphSizeY=graphSizeY,
+            move(person=ind, population=population, t=t, U=U, V=V, graphSizeX=graphSizeX, graphSizeY=graphSizeY,
                  positionToID=positionToID)
         numInfected = calculateNumberInfected(population=population)
         arrayInfected.append(numInfected)
-    positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
-    print(positionArray)
-    print(positionToID)
+    #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
+    #print(positionArray)
+    #print(positionToID)
 
 
     print('------------------------')
     print(arrayInfected)
 
+    return arrayInfected
+
+
+
+
+
+def main():
+    U = 0.3
+    t = 0.2
+    V = 0.06
+    np.random.seed(42)
+    graphSizeX = 30
+    graphSizeY = 30
+    population = list()
+    numPop = 500
+    numInfected = 3
+    simulation(U=U, t=t, V=V, n=0.01)
 
 
 

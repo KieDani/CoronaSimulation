@@ -163,7 +163,6 @@ def timestep(population):
 #n...initially infected persons per population
 def simulation(U, t, V, n):
     #initial values
-    np.random.seed(42)
     graphSizeX = 100
     graphSizeY = 100
     population = list()
@@ -215,7 +214,7 @@ def simulation(U, t, V, n):
 
 
     print('------------------------')
-    print(arrayInfected)
+    #print(arrayInfected)
 
     return arrayInfected
 
@@ -224,16 +223,20 @@ def simulation(U, t, V, n):
 
 
 def main():
+    np.random.seed(42)
     U = 0.5
     t = 0.01
     V = 0.005
-    np.random.seed(42)
-    graphSizeX = 30
-    graphSizeY = 30
-    population = list()
-    numPop = 500
-    numInfected = 3
+    number_loops = 5
     arrayInfected = simulation(U=U, t=t, V=V, n=0.01)
+    arrayInfected = np.asarray(arrayInfected)
+    print(arrayInfected)
+    for i in range(number_loops - 1):
+        arrayInfected = arrayInfected + np.asarray(simulation(U=U, t=t, V=V, n=0.01))
+        print(arrayInfected)
+    #arrayInfected = np.asarray(arrayInfected)
+    arrayInfected = arrayInfected / float(number_loops)
+    print(arrayInfected)
     plt.plot(arrayInfected)
     plt.show()
 

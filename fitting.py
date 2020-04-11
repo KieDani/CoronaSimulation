@@ -3,6 +3,7 @@ import main as ma
 import constants as const
 from multiprocessing import Pool
 from scipy.optimize import curve_fit
+import scipy as sc
 from numba import jit
 
 # Data from https://www.n-tv.de/infografik/Coronavirus-aktuelle-Zahlen-Daten-zur-Epidemie-in-Deutschland-Europa-und-der-Welt-article21604983.html
@@ -25,7 +26,7 @@ n = number_sick[0] / float(population_germany)
 print(n)
 
 
-def simulate_multi(U, t, V):
+def simulate_multi(x, U, t, V):
     number_processes = const.number_processes
     numberDays = 34
     n = 3.234375e-07
@@ -42,9 +43,9 @@ def simulate_multi(U, t, V):
         # print(result[i])
     arrayInfected = arrayInfected / float(number_processes)
 
-    return arrayInfected
+    return arrayInfected[x]
 
-def simulate(U, t, V):
+def simulate(x, U, t, V):
     number_processes = const.number_processes
     number_loops = number_processes
     numberDays = 34
@@ -57,16 +58,18 @@ def simulate(U, t, V):
 
     arrayInfected = arrayInfected / float(number_loops)
 
-    return arrayInfected
+    return arrayInfected[x]
 
 
 def fitting_scipy(xdata, ydata):
-    popt, pcov = curve_fit(simulate, xdata, ydata)
+    popt, pcov = curve_fit(simulate_multi, xdata, ydata, bounds=([0.2, 0.0001, 0.000001], [0.85, 0.4, 0.2]))
     print(popt)
     print(pcov)
 
-xdata = range(len(number_sick))
-#fitting_scipy(xdata=xdata, ydata=number_sick)
+print(sc.__version__)
+xdata = range(0, 34)
+print(xdata)
+fitting_scipy(xdata=xdata, ydata=number_sick)
 
 
 

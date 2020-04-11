@@ -45,6 +45,7 @@ def buildPositionArray(population, graphSizeX, graphSizeY):
     return positionArray
 
 
+#@jit(nopython=True)
 def move(person, population, t, U, V, graphSizeX, graphSizeY, positionToID):
     r = np.random.rand()
     r2 = np.random.rand()
@@ -163,6 +164,7 @@ def timestep(population):
 
 
 #n...initially infected persons per population
+#@jit(nopython=True)
 def simulation(U, t, V, n):
     #initial values
     graphSizeX = const.graphSizeX

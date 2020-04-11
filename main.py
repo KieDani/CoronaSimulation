@@ -6,10 +6,11 @@ from numba import jit
 
 
 #ensure, that no position is taken twice in the beginning
-def initializePosition(population, positionArray, graphSizeX, graphSizeY):
+def initializePosition(population, positionToID, graphSizeX, graphSizeY):
     while(True):
         pos = np.random.randint(graphSizeX, size=2)
-        if(positionArray[pos[0], pos[1]] == 0):
+        liste = positionToID[pos[1] * graphSizeX + pos[0]]
+        if len(liste) == 0:
             return pos
 
 
@@ -183,8 +184,8 @@ def simulation(U, t, V, n):
 
     #put persons into lattice
     for id in range(0, numPop):
-        positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
-        pos = initializePosition(population=population, positionArray=positionArray, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
+        #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
+        pos = initializePosition(population=population, positionToID=positionToID, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
         # positionArray[pos[0], pos[1]] += 1
         population.append(P.Person(id=id, xPos=pos[0], yPos=pos[1], graphSizeX=graphSizeX, graphSizeY=graphSizeY))
         positionToID[pos[1] * graphSizeX + pos[0]].append(id)

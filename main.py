@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import Person as P
 import constants as const
+from multiprocessing import Pool
 from numba import jit
 
 
@@ -165,7 +166,8 @@ def timestep(population):
 
 #n...initially infected persons per population
 #@jit(nopython=True)
-def simulation(U, t, V, n):
+def simulation(U, t, V, n, numberDays, seed):
+    np.random.seed(seed)
     #initial values
     graphSizeX = const.graphSizeX
     graphSizeY = const.graphSizeY
@@ -203,7 +205,7 @@ def simulation(U, t, V, n):
     #print(positionToID)
     #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
     #print(positionArray)
-    for j in range(60):
+    for j in range(numberDays):
         print(j)
         timestep(population=population)
         for i in range(lengthOfDay):
@@ -227,23 +229,38 @@ def simulation(U, t, V, n):
 
 
 def main():
-    np.random.seed(42)
     U = const.U
     t = const.t
     V = const.V
     n = const.n
     number_loops = 5
-    arrayInfected = simulation(U=U, t=t, V=V, n=n)
-    arrayInfected = np.asarray(arrayInfected)
-    print(arrayInfected)
-    for i in range(number_loops - 1):
-        arrayInfected = arrayInfected + np.asarray(simulation(U=U, t=t, V=V, n=0.01))
-        print(arrayInfected)
-    #arrayInfected = np.asarray(arrayInfected)
-    arrayInfected = arrayInfected / float(number_loops)
+    number_processes = const.number_processes
+    numberDays = 40
+
+    poolarray = []
+    for i in range(number_processes):
+        poolarray.append((U,t,V,n, numberDays, 42+i))
+    pool = Pool(processes=number_processes)
+    result = pool.starmap(simulation, poolarray)
+
+    arrayInfected = np.asarray(result[0])
+    for i in range(1, number_processes):
+        arrayInfected += np.asarray(result[i])
+        #print(result[i])
+    arrayInfected = arrayInfected / float(number_processes)
     print(arrayInfected)
     plt.plot(arrayInfected)
     plt.show()
+
+    # print(arrayInfected)
+    # for i in range(number_loops - 1):
+    #     arrayInfected = arrayInfected + np.asarray(simulation(U=U, t=t, V=V, n=0.01))
+    #     print(arrayInfected)
+    # #arrayInfected = np.asarray(arrayInfected)
+    # arrayInfected = arrayInfected / float(number_loops)
+    # print(arrayInfected)
+    # plt.plot(arrayInfected)
+    # plt.show()
 
 
 

@@ -7,3 +7,4 @@ t = 0.01
 V = 0.005
 n = 0.01
 durationSickness = 14
+number_processes = 4

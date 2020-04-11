@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import Person as P
+import constants as const
 from numba import jit
 
 
@@ -163,11 +164,11 @@ def timestep(population):
 #n...initially infected persons per population
 def simulation(U, t, V, n):
     #initial values
-    graphSizeX = 100
-    graphSizeY = 100
+    graphSizeX = const.graphSizeX
+    graphSizeY = const.graphSizeY
     population = list()
-    numPop = 2000
-    lengthOfDay = 4
+    numPop = const.numPop
+    lengthOfDay = const.lengthOfDay
     numInfected = int(np.ceil(n * numPop))
     # 0...empty, 1...taken once, -1...infected
     # positionArray = np.zeros((graphSizeX, graphSizeY), dtype=np.int8)
@@ -224,11 +225,12 @@ def simulation(U, t, V, n):
 
 def main():
     np.random.seed(42)
-    U = 0.5
-    t = 0.01
-    V = 0.005
+    U = const.U
+    t = const.t
+    V = const.V
+    n = const.n
     number_loops = 5
-    arrayInfected = simulation(U=U, t=t, V=V, n=0.01)
+    arrayInfected = simulation(U=U, t=t, V=V, n=n)
     arrayInfected = np.asarray(arrayInfected)
     print(arrayInfected)
     for i in range(number_loops - 1):

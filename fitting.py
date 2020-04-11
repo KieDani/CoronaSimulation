@@ -25,7 +25,7 @@ n = number_sick[0] / float(population_germany)
 print(n)
 
 
-def simulate(U, t, V):
+def simulate_multi(U, t, V):
     number_processes = const.number_processes
     numberDays = 34
     n = 3.234375e-07
@@ -44,17 +44,29 @@ def simulate(U, t, V):
 
     return arrayInfected
 
+def simulate(U, t, V):
+    number_processes = const.number_processes
+    number_loops = number_processes
+    numberDays = 34
+    n = 3.234375e-07
 
-def fitting(xdata, ydata):
+    arrayInfected = ma.simulation(U=U, t=t, V=V, n=n, numberDays=numberDays, seed=42)
+    arrayInfected = np.asarray(arrayInfected)
+    for i in range(1, number_loops):
+        arrayInfected += np.asarray(ma.simulation(U=U, t=t, V=V, n=n, numberDays=numberDays, seed=42))
+
+    arrayInfected = arrayInfected / float(number_loops)
+
+    return arrayInfected
+
+
+def fitting_scipy(xdata, ydata):
     popt, pcov = curve_fit(simulate, xdata, ydata)
     print(popt)
     print(pcov)
 
 xdata = range(len(number_sick))
-fitting(xdata=xdata, ydata=number_sick)
-
-
-
+#fitting_scipy(xdata=xdata, ydata=number_sick)
 
 
 

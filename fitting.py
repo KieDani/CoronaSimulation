@@ -166,6 +166,12 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
             else:
                 parent2 = population[0]
             child1, child2 = crossover(parent1, parent2)
+            result1 = simulate_multi2(child1[0], child1[1], child1[2])
+            result2 = simulate_multi2(child2[0], child2[1], child2[2])
+            fitness1 = np.linalg.norm(actual_number_sick - result1)
+            fitness2 = np.linalg.norm(actual_number_sick - result2)
+            child1[3] = fitness1
+            child2[3] = fitness2
             new_population.append(child1)
             new_population.append(child2)
         population = new_population

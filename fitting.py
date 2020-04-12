@@ -133,8 +133,8 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
         V = np.random.rand() * (0.01 - 0.00001) + 0.00001
 
         result = simulate_multi2(U, t, V)
-        print(result)
-        print(actual_number_sick)
+        #print(result)
+        #print(actual_number_sick)
         fitness = np.absolute(actual_number_sick - result)
 
         ind = [U, t, V, fitness]

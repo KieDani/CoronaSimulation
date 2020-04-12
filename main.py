@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import Person as P
 import constants as const
 from multiprocessing import Pool
-from numba import jit
+#from numba import jit
 
 
 #ensure, that no position is taken twice in the beginning

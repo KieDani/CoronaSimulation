@@ -4,7 +4,7 @@ import constants as const
 from multiprocessing import Pool
 from scipy.optimize import curve_fit
 import scipy as sc
-from numba import jit
+#from numba import jit
 
 # Data from https://www.n-tv.de/infografik/Coronavirus-aktuelle-Zahlen-Daten-zur-Epidemie-in-Deutschland-Europa-und-der-Welt-article21604983.html
 # from 08.03.2020 to 10.04.2020

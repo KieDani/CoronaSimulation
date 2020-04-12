@@ -1,21 +1,21 @@
 import constants as const
-from numba import jit, jitclass
-from numba import int32, float32, boolean
+#from numba import jit, jitclass
+#from numba import int32, float32, boolean
 
 class Person:
 
-    spec = [
-        ('id', int32),
-        ('xPos', int32),
-        ('yPos', int32),
-        ('infected', boolean),
-        ('timeInfected', int32),
-        ('immune', boolean),
-        ('durationSickness', int32),
-        ('atImpurity', boolean),
-        ('graphSizeX', int32),
-        ('graphSizeY', int32),
-    ]
+    # spec = [
+    #     ('id', int32),
+    #     ('xPos', int32),
+    #     ('yPos', int32),
+    #     ('infected', boolean),
+    #     ('timeInfected', int32),
+    #     ('immune', boolean),
+    #     ('durationSickness', int32),
+    #     ('atImpurity', boolean),
+    #     ('graphSizeX', int32),
+    #     ('graphSizeY', int32),
+    # ]
 
     #@jitclass(spec)
     def __init__(self, id, xPos, yPos, graphSizeX, graphSizeY):

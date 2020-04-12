@@ -123,7 +123,7 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
         return mating_pool
 
     #initialize population
-    population = list()
+    population = []
     for i in range(populationsize):
         #between 0.5 and 0.95
         U = np.random.rand() * 0.45 + 0.5
@@ -135,7 +135,7 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
         result = simulate_multi2(U, t, V)
         #print(result)
         #print(actual_number_sick)
-        fitness = np.absolute(actual_number_sick - result)
+        fitness = np.linalg.norm(actual_number_sick - result)
 
         ind = [U, t, V, fitness]
         population.append(ind)
@@ -144,10 +144,14 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
     #TODO check if I need deepcopy
     best_ind = population[0].copy()
     best_ind_fitness = best_ind[3]
+    print(population)
+    print(best_ind)
+    print(best_ind_fitness)
     for i in range(1, len(population)):
         if(population[i][3] < best_ind_fitness):
             best_ind = population[i]
             best_ind_fitness = population[i][3]
+            print('Fitness: ' + str(best_ind_fitness))
 
     #create new generations
     #TODO add mutations

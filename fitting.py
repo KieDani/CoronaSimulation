@@ -123,15 +123,21 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
                 mating_pool.append(population[index2])
         return mating_pool
 
+    U_min = 0.5
+    U_max = 0.95
+    t_min = 0.0001
+    t_max = 0.15
+    V_min = 0.00001
+    V_max = 0.01
     #initialize population
     population = []
     for i in range(populationsize):
         #between 0.5 and 0.95
-        U = np.random.rand() * 0.45 + 0.5
+        U = np.random.rand() * (U_max - U_min) + U_min
         #between 0.0001 and 0.15
-        t = np.random.rand() * (0.15 - 0.0001) + 0.0001
+        t = np.random.rand() * (t_max - t_min) + t_min
         #between 0.00001 and 0.01
-        V = np.random.rand() * (0.01 - 0.00001) + 0.00001
+        V = np.random.rand() * (V_max - V_min) + V_min
 
         result = simulate_multi2(U, t, V)
         #print(result)

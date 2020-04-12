@@ -96,7 +96,7 @@ print(xdata)
 #fitting_scipy(xdata=xdata, ydata=number_sick)
 
 
-def fitting_genetic(actual_number_sick, populationsize = 25, number_generations = 7):
+def fitting_genetic(actual_number_sick, populationsize = 30, number_generations = 10):
     def crossover(parent1, parent2):
         child1 = []
         child2 = []
@@ -111,15 +111,16 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
         return child1, child2
 
     def selection(population):
-        index1 = np.random.randint(low=0, high=len(population))
-        index2 = np.random.randint(low=0, high=len(population))
-        while(index1 == index2):
-            index2 = np.random.randint(low=0, high=len(population))
         mating_pool = []
-        if(population[index1][3] < population[index2][3]):
-            mating_pool.append(population[index1])
-        else:
-            mating_pool.append(population[index2])
+        for i in range(len(population)):
+            index1 = np.random.randint(low=0, high=len(population))
+            index2 = np.random.randint(low=0, high=len(population))
+            while(index1 == index2):
+                index2 = np.random.randint(low=0, high=len(population))
+            if(population[index1][3] < population[index2][3]):
+                mating_pool.append(population[index1])
+            else:
+                mating_pool.append(population[index2])
         return mating_pool
 
     #initialize population
@@ -149,8 +150,9 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
     #print(best_ind_fitness)
     for i in range(1, len(population)):
         if(population[i][3] < best_ind_fitness):
-            best_ind = population[i]
-            best_ind_fitness = population[i][3]
+            # TODO check if I need deepcopy
+            best_ind = population[i].copy()
+            best_ind_fitness = best_ind[3]
             print('Fitness: ' + str(best_ind_fitness))
 
     #create new generations
@@ -174,13 +176,14 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
             child2[3] = fitness2
             new_population.append(child1)
             new_population.append(child2)
-        population = new_population
+        population = new_population.copy()
 
         #search, if there is a new best individual
         for i in range(1, len(population)):
             if (population[i][3] < best_ind_fitness):
-                best_ind = population[i]
-                best_ind_fitness = population[i][3]
+                # TODO check if I need deepcopy
+                best_ind = population[i].copy()
+                best_ind_fitness = best_ind[3]
                 print('found new best individual')
                 print('Fitness: ' + str(best_ind_fitness))
 

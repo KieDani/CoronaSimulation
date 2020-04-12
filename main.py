@@ -205,7 +205,7 @@ def simulation(U, t, V, n, numberDays, seed):
     #print(positionToID)
     #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
     #print(positionArray)
-    for j in range(numberDays):
+    for j in range(numberDays-1):
         print(j)
         timestep(population=population)
         for i in range(lengthOfDay):

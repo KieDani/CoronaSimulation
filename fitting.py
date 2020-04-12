@@ -161,7 +161,7 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
         new_population = list()
         for i in range(0, len(mating_pool), 2):
             parent1 = mating_pool[i]
-            if(i+1 <= len(population)):
+            if(i+1 < len(mating_pool)):
                 parent2 = mating_pool[i+1]
             else:
                 parent2 = mating_pool[0]

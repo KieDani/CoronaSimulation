@@ -159,12 +159,12 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
         print('Generation: ' + str(gen))
         mating_pool = selection(population)
         new_population = list()
-        for i in range(0, len(population), 2):
-            parent1 = population[i]
+        for i in range(0, len(mating_pool), 2):
+            parent1 = mating_pool[i]
             if(i+1 < len(population)):
-                parent2 = population[i+1]
+                parent2 = mating_pool[i+1]
             else:
-                parent2 = population[0]
+                parent2 = mating_pool[0]
             child1, child2 = crossover(parent1, parent2)
             result1 = simulate_multi2(child1[0], child1[1], child1[2])
             result2 = simulate_multi2(child2[0], child2[1], child2[2])

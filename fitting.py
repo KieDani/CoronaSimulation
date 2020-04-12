@@ -144,9 +144,9 @@ def fitting_genetic(actual_number_sick, populationsize = 25, number_generations 
     #TODO check if I need deepcopy
     best_ind = population[0].copy()
     best_ind_fitness = best_ind[3]
-    print(population)
-    print(best_ind)
-    print(best_ind_fitness)
+    #print(population)
+    #print(best_ind)
+    #print(best_ind_fitness)
     for i in range(1, len(population)):
         if(population[i][3] < best_ind_fitness):
             best_ind = population[i]

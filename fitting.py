@@ -96,7 +96,7 @@ print(xdata)
 #fitting_scipy(xdata=xdata, ydata=number_sick)
 
 
-def fitting_genetic(actual_number_sick, populationsize = 30, number_generations = 10):
+def fitting_genetic(actual_number_sick, populationsize = 25, number_generations = 10):
     def crossover(parent1, parent2):
         child1 = []
         child2 = []
@@ -123,16 +123,29 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
                 mating_pool.append(population[index2])
         return mating_pool
 
+    def mutation(individual, U_max, U_min, t_max, t_min, V_max, V_min):
+        #how big is the mutation
+        step_percent = 0.1
+        gen_index = np.random.randint(low=0, high=3)
+        tmp = [U_max, U_min, t_max, t_min, V_max, V_min]
+        mut = 2 * (np.random.rand() - 0.5) * (tmp[2 * gen_index] - tmp[2 * gen_index + 1]) * step_percent
+        #ensure, that the values are in the alllowed area
+        while(individual[gen_index] + mut < tmp[2*gen_index + 1] or individual[gen_index] + mut > tmp[2*gen_index]):
+            mut = 2 * (np.random.rand() - 0.5) * (tmp[2 * gen_index] - tmp[2 * gen_index + 1]) * step_percent
+        individual[gen_index] += mut
+        return individual
+
     U_min = 0.5
     U_max = 0.95
     t_min = 0.0001
     t_max = 0.15
     V_min = 0.00001
     V_max = 0.01
+    probability_mutation = 0.2
     #initialize population
     population = []
     for i in range(populationsize):
-        #between 0.5 and 0.95
+        #between 0.5 and 0.9530
         U = np.random.rand() * (U_max - U_min) + U_min
         #between 0.0001 and 0.15
         t = np.random.rand() * (t_max - t_min) + t_min
@@ -162,7 +175,6 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
             print('Fitness: ' + str(best_ind_fitness))
 
     #create new generations
-    #TODO add mutations
     for gen in range(1, number_generations + 1):
         print('Generation: ' + str(gen))
         mating_pool = selection(population)
@@ -174,6 +186,12 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
             else:
                 parent2 = mating_pool[0]
             child1, child2 = crossover(parent1, parent2)
+            if(np.random.rand() < probability_mutation):
+                child1 = mutation(child1, U_max, U_min, t_max, t_min, V_max, V_min)
+                print('mutation 1')
+            if (np.random.rand() < probability_mutation):
+                child2 = mutation(child2, U_max, U_min, t_max, t_min, V_max, V_min)
+                print('mutation 2')
             result1 = simulate_multi2(child1[0], child1[1], child1[2])
             result2 = simulate_multi2(child2[0], child2[1], child2[2])
             fitness1 = np.linalg.norm(actual_number_sick - result1)

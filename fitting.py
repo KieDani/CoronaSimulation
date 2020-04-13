@@ -53,8 +53,10 @@ def simulate_multi2(U, t, V):
     poolarray = []
     for i in range(number_processes):
         poolarray.append((U, t, V, n, numberDays, 42 + i))
-    pool = Pool(processes=number_processes)
-    result = pool.starmap(ma.simulation, poolarray)
+    with Pool(processes=number_processes) as pool:
+        result = pool.starmap(ma.simulation, poolarray)
+    #pool = Pool(processes=number_processes)
+    #result = pool.starmap(ma.simulation, poolarray)
 
     arrayInfected = np.asarray(result[0])
     for i in range(1, number_processes):
@@ -96,7 +98,7 @@ print(xdata)
 #fitting_scipy(xdata=xdata, ydata=number_sick)
 
 
-def fitting_genetic(actual_number_sick, populationsize = 25, number_generations = 10):
+def fitting_genetic(actual_number_sick, populationsize = 30, number_generations = 10):
     def crossover(parent1, parent2):
         child1 = []
         child2 = []

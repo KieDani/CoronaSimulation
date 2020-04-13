@@ -7,4 +7,4 @@ t = 0.020005
 V = 0.0025005
 n = 3.234375e-07
 durationSickness = 14
-number_processes = 4
+number_processes = 8

@@ -19,6 +19,13 @@ number_immune = np.asarray(number_immune_original) * 10
 
 number_sick = number_sick / float(population_germany) * const.numPop
 
+
+#I guess till 28.03.2020
+number_sick_before = number_sick[0:21]
+#after 28.03.2020
+number_sick_after = number_sick[21:]
+
+
 print(number_sick)
 print(len(number_sick))
 
@@ -45,9 +52,9 @@ def simulate_multi(x, U, t, V):
 
     return arrayInfected[x]
 
-def simulate_multi2(U, t, V):
+def simulate_multi2(U, t, V, numberOfDays):
     number_processes = const.number_processes
-    numberDays = 34
+    numberDays = numberOfDays
     n = 3.234375e-07
 
     poolarray = []
@@ -92,9 +99,9 @@ def fitting_scipy(xdata, ydata):
             f.write(params[i] + ': ' + str(popt[i]) + '\n')
 
 
-print(sc.__version__)
+#print(sc.__version__)
 xdata = range(0, 34)
-print(xdata)
+#print(xdata)
 #fitting_scipy(xdata=xdata, ydata=number_sick)
 
 
@@ -154,7 +161,7 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
         #between 0.00001 and 0.01
         V = np.random.rand() * (V_max - V_min) + V_min
 
-        result = simulate_multi2(U, t, V)
+        result = simulate_multi2(U, t, V, numberOfDays = len(actual_number_sick))
         #print(result)
         #print(actual_number_sick)
         fitness = np.linalg.norm(actual_number_sick - result)
@@ -194,8 +201,8 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
             if (np.random.rand() < probability_mutation):
                 child2 = mutation(child2, U_max, U_min, t_max, t_min, V_max, V_min)
                 print('mutation 2')
-            result1 = simulate_multi2(child1[0], child1[1], child1[2])
-            result2 = simulate_multi2(child2[0], child2[1], child2[2])
+            result1 = simulate_multi2(child1[0], child1[1], child1[2], numberOfDays=len(actual_number_sick))
+            result2 = simulate_multi2(child2[0], child2[1], child2[2], numberOfDays=len(actual_number_sick))
             fitness1 = np.linalg.norm(actual_number_sick - result1)
             fitness2 = np.linalg.norm(actual_number_sick - result2)
             child1[3] = fitness1
@@ -219,10 +226,53 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
         for i in range(len(best_ind)):
             f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
 
+    return best_ind
+
+
+def main():
+    number_trials = 10
+    result_before = list()
+    for trial in range(number_trials):
+        best_ind = fitting_genetic(actual_number_sick=number_sick_before)
+        result_before.append(best_ind)
+        with open('parameter_genetic_before.txt', 'a') as f:
+            f.write('Trial: ' + str(trial))
+            params = ['U', 't', 'V', 'Fitness']
+            for i in range(len(best_ind)):
+                f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
+
+    number_trials = 10
+    result_after = list()
+    for trial in range(number_trials):
+        best_ind = fitting_genetic(actual_number_sick=number_sick_after)
+        result_after.append(best_ind)
+        with open('parameter_genetic_after.txt', 'a') as f:
+            f.write('Trial: ' + str(trial))
+            params = ['U', 't', 'V', 'Fitness']
+            for i in range(len(best_ind)):
+                f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
+
+    number_trials = 10
+    result = list()
+    for trial in range(number_trials):
+        best_ind = fitting_genetic(actual_number_sick=number_sick)
+        result.append(best_ind)
+        with open('parameter_genetic.txt', 'a') as f:
+            f.write('Trial: ' + str(trial))
+            params = ['U', 't', 'V', 'Fitness']
+            for i in range(len(best_ind)):
+                f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
+
+    print(result)
+    print(result_before)
+    print(result_after)
+
+if __name__== "__main__":
+    main()
 
 
 
-fitting_genetic(actual_number_sick=number_sick)
+
 
 
 

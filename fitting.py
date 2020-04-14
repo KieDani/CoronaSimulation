@@ -44,9 +44,9 @@ def simulate_multi(x, U, t, V):
     pool = Pool(processes=number_processes)
     result = pool.starmap(ma.simulation, poolarray)
 
-    arrayInfected = np.asarray(result[0])
+    arrayInfected = np.asarray(result[0][0])
     for i in range(1, number_processes):
-        arrayInfected += np.asarray(result[i])
+        arrayInfected += np.asarray(result[i][0])
         # print(result[i])
     arrayInfected = arrayInfected / float(number_processes)
 
@@ -65,9 +65,9 @@ def simulate_multi2(U, t, V, numberOfDays):
     #pool = Pool(processes=number_processes)
     #result = pool.starmap(ma.simulation, poolarray)
 
-    arrayInfected = np.asarray(result[0])
+    arrayInfected = np.asarray(result[0][0])
     for i in range(1, number_processes):
-        arrayInfected += np.asarray(result[i])
+        arrayInfected += np.asarray(result[i][0])
         # print(result[i])
     arrayInfected = arrayInfected / float(number_processes)
 
@@ -79,7 +79,7 @@ def simulate(x, U, t, V):
     numberDays = 34
     n = 3.234375e-07
 
-    arrayInfected = ma.simulation(U=U, t=t, V=V, n=n, numberDays=numberDays, seed=42)
+    arrayInfected = ma.simulation(U=U, t=t, V=V, n=n, numberDays=numberDays, seed=42)[0]
     arrayInfected = np.asarray(arrayInfected)
     for i in range(1, number_loops):
         arrayInfected += np.asarray(ma.simulation(U=U, t=t, V=V, n=n, numberDays=numberDays, seed=42))
@@ -230,6 +230,8 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
 
 
 def main():
+    n = number_sick_before[0] / float(population_germany)
+    const.n = n
     number_trials = 10
     result_before = list()
     for trial in range(number_trials):
@@ -241,6 +243,8 @@ def main():
             for i in range(len(best_ind)):
                 f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
 
+    n = number_sick_after[0] / float(population_germany)
+    const.n = n
     number_trials = 10
     result_after = list()
     for trial in range(number_trials):
@@ -252,6 +256,8 @@ def main():
             for i in range(len(best_ind)):
                 f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
 
+    n = number_sick[0] / float(population_germany)
+    const.n = n
     number_trials = 10
     result = list()
     for trial in range(number_trials):

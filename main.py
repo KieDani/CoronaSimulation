@@ -159,6 +159,13 @@ def calculateNumberInfected(population):
             numInfected += 1
     return numInfected
 
+def calculateNumberImmune(population):
+    numImmune = 0
+    for ind in population:
+        if(ind.isImmune() == True):
+            numImmune += 1
+    return numImmune
+
 def timestep(population):
     for ind in population:
         ind.timeStep()
@@ -202,6 +209,8 @@ def simulation(U, t, V, n, numberDays, seed):
     #move the people around
     arrayInfected = list()
     arrayInfected.append(numInfected)
+    arrayImmune = list()
+    arrayImmune.append(0)
     #print(positionToID)
     #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
     #print(positionArray)
@@ -213,7 +222,9 @@ def simulation(U, t, V, n, numberDays, seed):
                 move(person=ind, population=population, t=t, U=U, V=V, graphSizeX=graphSizeX, graphSizeY=graphSizeY,
                      positionToID=positionToID)
         numInfected = calculateNumberInfected(population=population)
+        numImmune = calculateNumberImmune(population)
         arrayInfected.append(numInfected)
+        arrayImmune.append(numImmune)
     #positionArray = buildPositionArray(population=population, graphSizeX=graphSizeX, graphSizeY=graphSizeY)
     #print(positionArray)
     #print(positionToID)
@@ -222,7 +233,7 @@ def simulation(U, t, V, n, numberDays, seed):
     print('------------------------')
     #print(arrayInfected)
 
-    return arrayInfected
+    return arrayInfected, arrayImmune
 
 
 
@@ -240,16 +251,20 @@ def main():
     poolarray = []
     for i in range(number_processes):
         poolarray.append((U,t,V,n, numberDays, 42+i))
-    pool = Pool(processes=number_processes)
-    result = pool.starmap(simulation, poolarray)
+    with Pool(processes=number_processes) as pool:
+        result = pool.starmap(simulation, poolarray)
 
-    arrayInfected = np.asarray(result[0])
+    arrayInfected = np.asarray(result[0][0])
+    arrayImmune = np.asarray(result[0][1])
     for i in range(1, number_processes):
-        arrayInfected += np.asarray(result[i])
+        arrayInfected += np.asarray(result[i][0])
+        arrayImmune += np.asarray(result[i][1])
         #print(result[i])
     arrayInfected = arrayInfected / float(number_processes)
+    arrayImmune = arrayImmune / float(number_processes)
     print(arrayInfected)
-    plt.plot(arrayInfected)
+    plt.plot(arrayInfected, color='red')
+    plt.plot(arrayImmune, color='green')
     plt.show()
 
     # print(arrayInfected)

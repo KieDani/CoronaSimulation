@@ -34,13 +34,21 @@ print(n)
 
 
 def simulate_multi(x, U, t, V):
+    U_array = list()
+    t_array = list()
+    V_array = list()
+    for i in range(len(x)):
+        U_array.append(U)
+        t_array.append(t)
+        V_array.append(V)
+
     number_processes = const.number_processes
     numberDays = 34
     n = 3.234375e-07
 
     poolarray = []
     for i in range(number_processes):
-        poolarray.append((U, t, V, n, numberDays, 42 + i))
+        poolarray.append((U_array, t_array, V_array, n, numberDays, 42 + i))
     pool = Pool(processes=number_processes)
     result = pool.starmap(ma.simulation, poolarray)
 
@@ -161,7 +169,14 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
         #between 0.00001 and 0.01
         V = np.random.rand() * (V_max - V_min) + V_min
 
-        result = simulate_multi2(U, t, V, numberOfDays = len(actual_number_sick))
+        U_array = list()
+        t_array = list()
+        V_array = list()
+        for i in range(len(actual_number_sick)):
+            U_array.append(U)
+            t_array.append(t)
+            V_array.append(V)
+        result = simulate_multi2(U_array, t_array, V_array, numberOfDays = len(actual_number_sick))
         #print(result)
         #print(actual_number_sick)
         fitness = np.linalg.norm(actual_number_sick - result)
@@ -201,8 +216,22 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
             if (np.random.rand() < probability_mutation):
                 child2 = mutation(child2, U_max, U_min, t_max, t_min, V_max, V_min)
                 print('mutation 2')
-            result1 = simulate_multi2(child1[0], child1[1], child1[2], numberOfDays=len(actual_number_sick))
-            result2 = simulate_multi2(child2[0], child2[1], child2[2], numberOfDays=len(actual_number_sick))
+
+            U_array1 = list()
+            t_array1 = list()
+            V_array1 = list()
+            U_array2 = list()
+            t_array2 = list()
+            V_array2 = list()
+            for i in range(len(actual_number_sick)):
+                U_array1.append(child1[0])
+                t_array1.append(child1[1])
+                V_array1.append(child1[2])
+                U_array2.append(child2[0])
+                t_array2.append(child2[1])
+                V_array2.append(child2[2])
+            result1 = simulate_multi2(U_array1, t_array1, V_array1, numberOfDays=len(actual_number_sick))
+            result2 = simulate_multi2(U_array2, t_array2, V_array2, numberOfDays=len(actual_number_sick))
             fitness1 = np.linalg.norm(actual_number_sick - result1)
             fitness2 = np.linalg.norm(actual_number_sick - result2)
             child1[3] = fitness1

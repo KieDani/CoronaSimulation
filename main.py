@@ -219,7 +219,7 @@ def simulation(U, t, V, n, numberDays, seed):
         timestep(population=population)
         for i in range(lengthOfDay):
             for ind in population:
-                move(person=ind, population=population, t=t, U=U, V=V, graphSizeX=graphSizeX, graphSizeY=graphSizeY,
+                move(person=ind, population=population, t=t[j], U=U[j], V=V[j], graphSizeX=graphSizeX, graphSizeY=graphSizeY,
                      positionToID=positionToID)
         numInfected = calculateNumberInfected(population=population)
         numImmune = calculateNumberImmune(population)
@@ -240,13 +240,17 @@ def simulation(U, t, V, n, numberDays, seed):
 
 
 def main():
-    U = const.U
-    t = const.t
-    V = const.V
+    numberDays = 40
+    U = list()
+    t = list()
+    V = list()
+    for i in range(numberDays):
+        U.append(const.U)
+        t.append(const.t)
+        V.append(const.V)
     n = const.n
     number_loops = 5
     number_processes = const.number_processes
-    numberDays = 40
 
     poolarray = []
     for i in range(number_processes):

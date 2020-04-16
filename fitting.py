@@ -259,7 +259,7 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
 
 
 #allows for a change of parameters because of a lockdown
-def fitting_genetic2(actual_number_sick, populationsize = 6, number_generations = 4, time_lockdown = 21):
+def fitting_genetic2(actual_number_sick, populationsize = 30, number_generations = 10, time_lockdown = 21):
     def crossover(parent1, parent2):
         child1 = []
         child2 = []
@@ -290,6 +290,7 @@ def fitting_genetic2(actual_number_sick, populationsize = 6, number_generations 
         #how big is the mutation
         step_percent = 0.1
         gen_index = np.random.randint(low=0, high=len(individual))
+        print(gen_index)
         tmp = [U_max, U_min, t_max, t_min, V_max, V_min, U_max, U_min, t_max, t_min, V_max, V_min]
         mut = 2 * (np.random.rand() - 0.5) * (tmp[2 * gen_index] - tmp[2 * gen_index + 1]) * step_percent
         #ensure, that the values are in the alllowed area
@@ -321,11 +322,11 @@ def fitting_genetic2(actual_number_sick, populationsize = 6, number_generations 
         U_array = list()
         t_array = list()
         V_array = list()
-        for i in range(len(actual_number_sick[:time_lockdown])):
+        for j in range(len(actual_number_sick[:time_lockdown])):
             U_array.append(U_before)
             t_array.append(t_before)
             V_array.append(V_before)
-        for i in range(len(actual_number_sick[time_lockdown:])):
+        for j in range(len(actual_number_sick[time_lockdown:])):
             U_array.append(U_after)
             t_array.append(t_after)
             V_array.append(V_after)
@@ -376,14 +377,14 @@ def fitting_genetic2(actual_number_sick, populationsize = 6, number_generations 
             U_array2 = list()
             t_array2 = list()
             V_array2 = list()
-            for i in range(len(actual_number_sick[:time_lockdown])):
+            for j in range(len(actual_number_sick[:time_lockdown])):
                 U_array1.append(child1[0])
                 t_array1.append(child1[1])
                 V_array1.append(child1[2])
                 U_array2.append(child2[0])
                 t_array2.append(child2[1])
                 V_array2.append(child2[2])
-            for i in range(len(actual_number_sick[time_lockdown:])):
+            for j in range(len(actual_number_sick[time_lockdown:])):
                 U_array1.append(child1[3])
                 t_array1.append(child1[4])
                 V_array1.append(child1[5])

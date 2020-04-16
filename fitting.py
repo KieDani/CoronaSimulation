@@ -289,7 +289,7 @@ def fitting_genetic2(actual_number_sick, populationsize = 30, number_generations
     def mutation(individual, U_max, U_min, t_max, t_min, V_max, V_min):
         #how big is the mutation
         step_percent = 0.1
-        gen_index = np.random.randint(low=0, high=len(individual))
+        gen_index = np.random.randint(low=0, high=len(individual) - 1)
         print(gen_index)
         tmp = [U_max, U_min, t_max, t_min, V_max, V_min, U_max, U_min, t_max, t_min, V_max, V_min]
         mut = 2 * (np.random.rand() - 0.5) * (tmp[2 * gen_index] - tmp[2 * gen_index + 1]) * step_percent

@@ -292,7 +292,7 @@ def main():
     for trial in range(number_trials):
         best_ind = fitting_genetic(actual_number_sick=number_sick)
         result.append(best_ind)
-        with open('parameter_genetic.txt', 'a') as f:
+        with open('parameter_genetic_overall.txt', 'a') as f:
             f.write('Trial: ' + str(trial))
             params = ['U', 't', 'V', 'Fitness']
             for i in range(len(best_ind)):

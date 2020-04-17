@@ -1,5 +1,5 @@
-graphSizeX = 400
-graphSizeY = 400
+graphSizeX = 100
+graphSizeY = 100
 numPop = 20000
 lengthOfDay = 4
 U = 0.6106590514037163

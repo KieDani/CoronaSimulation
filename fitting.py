@@ -259,7 +259,7 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
 
 
 #allows for a change of parameters because of a lockdown
-def fitting_genetic2(actual_number_sick, populationsize = 30, number_generations = 10, time_lockdown = 21):
+def fitting_genetic2(actual_number_sick, populationsize = 50, number_generations = 7, time_lockdown = 21):
     def crossover(parent1, parent2):
         child1 = []
         child2 = []
@@ -302,7 +302,7 @@ def fitting_genetic2(actual_number_sick, populationsize = 30, number_generations
     U_min = 0.5
     U_max = 0.95
     t_min = 0.0001
-    t_max = 0.15
+    t_max = 0.25
     V_min = 0.00001
     V_max = 0.01
     probability_mutation = 0.2
@@ -450,12 +450,12 @@ def main():
 
     n = number_sick[0] / float(population_germany)
     const.n = n
-    number_trials = 10
+    number_trials = 5
     result = list()
     for trial in range(number_trials):
         best_ind = fitting_genetic2(actual_number_sick=number_sick)
         result.append(best_ind)
-        with open('parameter_genetic_overall.txt', 'a') as f:
+        with open('parameter_genetic_overall_factor' + str(faktor_actual_cases) +'.txt', 'a') as f:
             f.write('Trial: ' + str(trial) + '\n')
             params = ['U_before', 't_before', 'V_before', 'U_after', 't_after', 'V_after', 'Fitness']
             for i in range(len(best_ind)):

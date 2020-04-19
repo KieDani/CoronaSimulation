@@ -66,6 +66,8 @@ def simulate_multi_genetic(U, t, V, numberOfDays):
         # print(result[i])
     arrayInfected = arrayInfected / float(number_processes)
 
+    print('.')
+
     return arrayInfected
 
 

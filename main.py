@@ -231,7 +231,7 @@ def simulation(U, t, V, n, numberDays, seed):
     #print(positionToID)
 
 
-    print('------------------------')
+    #print('------------------------')
     #print(arrayInfected)
 
     return arrayInfected, arrayImmune

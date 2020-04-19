@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import Person as P
 import constants as const
 from multiprocessing import Pool
+#import fitting
 #from numba import jit
 
 
@@ -240,16 +241,19 @@ def simulation(U, t, V, n, numberDays, seed):
 
 
 def main():
-    numberDays = 40
+    numberDays = len(const.number_sick) + 5
     U = list()
     t = list()
     V = list()
-    for i in range(numberDays):
-        U.append(const.U)
-        t.append(const.t)
-        V.append(const.V)
+    for i in range(0, const.time_lockdown):
+        U.append(const.U_before)
+        t.append(const.t_before)
+        V.append(const.V_before)
+    for i in range(0, numberDays):
+        U.append(const.U_after)
+        t.append(const.t_after)
+        V.append(const.V_after)
     n = const.n
-    number_loops = 5
     number_processes = const.number_processes
 
     poolarray = []
@@ -266,9 +270,15 @@ def main():
         #print(result[i])
     arrayInfected = arrayInfected / float(number_processes)
     arrayImmune = arrayImmune / float(number_processes)
-    print(arrayInfected)
+    #print(np.asarray(arrayInfected[:len(const.number_sick)]) - np.asarray(const.number_sick))
+
+
     plt.plot(arrayInfected, color='red')
-    plt.plot(arrayImmune, color='green')
+    #plt.plot(arrayImmune, color='green')
+
+    plt.plot(const.number_sick, color = 'darkred')
+    #plt.plot(const.number_immune, color = 'darkgreen')
+
     plt.show()
 
     # print(arrayInfected)

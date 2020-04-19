@@ -6,34 +6,21 @@ from scipy.optimize import curve_fit
 import scipy as sc
 #from numba import jit
 
-# Data from https://www.n-tv.de/infografik/Coronavirus-aktuelle-Zahlen-Daten-zur-Epidemie-in-Deutschland-Europa-und-der-Welt-article21604983.html
-# from 08.03.2020 to 16.04.2020
-number_sick_original = [1035, 1180, 1563, 1899, 2746, 3675, 4599, 5796, 7232, 9375, 12300, 15305, 19655, 22189, 21963, 26102, 30014, 34252, 37301, 42968, 48241, 52584, 48469, 50271, 53389, 57048, 60483, 63595, 65798, 66767, 67922, 59823, 60326, 61340, 61235, 61208, 59322, 59322, 61476, 59748, 57098,  ]
-number_immune_original = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2809, 2809, 2809, 2809, 5600, 5600, 5600, 5600, 13500, 16100, 18700, 21400, 23800, 26400, 28700, 30600, 33300, 46300, 50000, 53913, 57400, 60200, 64300, 63781, 68107, 73469]
-population_germany = 80000000
-faktor_actual_cases = 100
-
-
-number_sick = np.asarray(number_sick_original) * faktor_actual_cases
-number_immune = np.asarray(number_immune_original) * faktor_actual_cases
-
-number_sick = number_sick / float(population_germany) * const.numPop
+number_sick = const.number_sick
+number_immune = const.number_immune
 
 
 #I guess till 28.03.2020
-number_sick_before = number_sick[0:21]
+number_sick_before = number_sick[0:const.time_lockdown]
 #after 28.03.2020
-number_sick_after = number_sick[21:]
+number_sick_after = number_sick[const.time_lockdown:]
 
 
 print(number_sick)
 print(len(number_sick))
 
-n = number_sick[0] / float(population_germany)
-print(n)
 
-
-def simulate_multi(x, U, t, V):
+def simulate_multi_scipy(x, U, t, V):
     U_array = list()
     t_array = list()
     V_array = list()
@@ -60,10 +47,10 @@ def simulate_multi(x, U, t, V):
 
     return arrayInfected[x]
 
-def simulate_multi2(U, t, V, numberOfDays):
+def simulate_multi_genetic(U, t, V, numberOfDays):
     number_processes = const.number_processes
     numberDays = numberOfDays
-    n = 3.234375e-07
+    n = const.n
 
     poolarray = []
     for i in range(number_processes):
@@ -81,24 +68,9 @@ def simulate_multi2(U, t, V, numberOfDays):
 
     return arrayInfected
 
-def simulate(x, U, t, V):
-    number_processes = const.number_processes
-    number_loops = number_processes
-    numberDays = 34
-    n = 3.234375e-07
-
-    arrayInfected = ma.simulation(U=U, t=t, V=V, n=n, numberDays=numberDays, seed=42)[0]
-    arrayInfected = np.asarray(arrayInfected)
-    for i in range(1, number_loops):
-        arrayInfected += np.asarray(ma.simulation(U=U, t=t, V=V, n=n, numberDays=numberDays, seed=42))
-
-    arrayInfected = arrayInfected / float(number_loops)
-
-    return arrayInfected[x]
-
 
 def fitting_scipy(xdata, ydata):
-    popt, pcov = curve_fit(simulate_multi, xdata, ydata, bounds=([0.5, 0.00001, 0.000001], [0.85, 0.04, 0.005]))
+    popt, pcov = curve_fit(simulate_multi_scipy, xdata, ydata, bounds=([0.5, 0.00001, 0.000001], [0.85, 0.04, 0.005]))
     print(popt)
     print(pcov)
     params = ['U', 't', 'V']
@@ -113,6 +85,7 @@ xdata = range(0, 34)
 #fitting_scipy(xdata=xdata, ydata=number_sick)
 
 
+#does not allow a lockdown
 def fitting_genetic(actual_number_sick, populationsize = 30, number_generations = 10):
     def crossover(parent1, parent2):
         child1 = []
@@ -176,7 +149,7 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
             U_array.append(U)
             t_array.append(t)
             V_array.append(V)
-        result = simulate_multi2(U_array, t_array, V_array, numberOfDays = len(actual_number_sick))
+        result = simulate_multi_genetic(U_array, t_array, V_array, numberOfDays = len(actual_number_sick))
         #print(result)
         #print(actual_number_sick)
         fitness = np.linalg.norm(actual_number_sick - result)
@@ -230,8 +203,8 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
                 U_array2.append(child2[0])
                 t_array2.append(child2[1])
                 V_array2.append(child2[2])
-            result1 = simulate_multi2(U_array1, t_array1, V_array1, numberOfDays=len(actual_number_sick))
-            result2 = simulate_multi2(U_array2, t_array2, V_array2, numberOfDays=len(actual_number_sick))
+            result1 = simulate_multi_genetic(U_array1, t_array1, V_array1, numberOfDays=len(actual_number_sick))
+            result2 = simulate_multi_genetic(U_array2, t_array2, V_array2, numberOfDays=len(actual_number_sick))
             fitness1 = np.linalg.norm(actual_number_sick - result1)
             fitness2 = np.linalg.norm(actual_number_sick - result2)
             child1[3] = fitness1
@@ -251,7 +224,7 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
 
     #save result:
     params = ['U', 't', 'V', 'Fitness']
-    with open('parameter_genetic.txt', 'w') as f:
+    with open('parameter_genetic_tmp.txt', 'w') as f:
         for i in range(len(best_ind)):
             f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
 
@@ -259,7 +232,7 @@ def fitting_genetic(actual_number_sick, populationsize = 30, number_generations 
 
 
 #allows for a change of parameters because of a lockdown
-def fitting_genetic2(actual_number_sick, populationsize = 50, number_generations = 7, time_lockdown = 21):
+def fitting_genetic_lockdown(actual_number_sick, populationsize = 10, number_generations = 3, time_lockdown = const.time_lockdown):
     def crossover(parent1, parent2):
         child1 = []
         child2 = []
@@ -330,7 +303,7 @@ def fitting_genetic2(actual_number_sick, populationsize = 50, number_generations
             U_array.append(U_after)
             t_array.append(t_after)
             V_array.append(V_after)
-        result = simulate_multi2(U_array, t_array, V_array, numberOfDays = len(actual_number_sick))
+        result = simulate_multi_genetic(U_array, t_array, V_array, numberOfDays = len(actual_number_sick))
         #print(result)
         #print(actual_number_sick)
         fitness = np.linalg.norm(actual_number_sick - result)
@@ -391,8 +364,8 @@ def fitting_genetic2(actual_number_sick, populationsize = 50, number_generations
                 U_array2.append(child2[3])
                 t_array2.append(child2[4])
                 V_array2.append(child2[5])
-            result1 = simulate_multi2(U_array1, t_array1, V_array1, numberOfDays=len(actual_number_sick))
-            result2 = simulate_multi2(U_array2, t_array2, V_array2, numberOfDays=len(actual_number_sick))
+            result1 = simulate_multi_genetic(U_array1, t_array1, V_array1, numberOfDays=len(actual_number_sick))
+            result2 = simulate_multi_genetic(U_array2, t_array2, V_array2, numberOfDays=len(actual_number_sick))
             fitness1 = np.linalg.norm(actual_number_sick - result1)
             fitness2 = np.linalg.norm(actual_number_sick - result2)
             child1[6] = fitness1
@@ -418,8 +391,8 @@ def fitting_genetic2(actual_number_sick, populationsize = 50, number_generations
 
     return best_ind
 
-# keeps the upper half of the generation for the next generation
-def fitting_genetic3(actual_number_sick, populationsize=6, number_generations=7, time_lockdown=21):
+# keeps the best individuals for the next generation
+def fitting_genetic_dev(actual_number_sick, populationsize=6, number_generations=7, time_lockdown=const.time_lockdown):
     def crossover(parent1, parent2):
         child1 = []
         child2 = []
@@ -503,7 +476,7 @@ def fitting_genetic3(actual_number_sick, populationsize=6, number_generations=7,
             U_array.append(U_after)
             t_array.append(t_after)
             V_array.append(V_after)
-        result = simulate_multi2(U_array, t_array, V_array, numberOfDays=len(actual_number_sick))
+        result = simulate_multi_genetic(U_array, t_array, V_array, numberOfDays=len(actual_number_sick))
         # print(result)
         # print(actual_number_sick)
         fitness = np.linalg.norm(actual_number_sick - result)
@@ -563,8 +536,8 @@ def fitting_genetic3(actual_number_sick, populationsize=6, number_generations=7,
                 U_array2.append(child2[3])
                 t_array2.append(child2[4])
                 V_array2.append(child2[5])
-            result1 = simulate_multi2(U_array1, t_array1, V_array1, numberOfDays=len(actual_number_sick))
-            result2 = simulate_multi2(U_array2, t_array2, V_array2, numberOfDays=len(actual_number_sick))
+            result1 = simulate_multi_genetic(U_array1, t_array1, V_array1, numberOfDays=len(actual_number_sick))
+            result2 = simulate_multi_genetic(U_array2, t_array2, V_array2, numberOfDays=len(actual_number_sick))
             fitness1 = np.linalg.norm(actual_number_sick - result1)
             fitness2 = np.linalg.norm(actual_number_sick - result2)
             child1[6] = fitness1
@@ -627,14 +600,12 @@ def main():
     #         for i in range(len(best_ind)):
     #             f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
 
-    n = number_sick[0] / float(population_germany)
-    const.n = n
     number_trials = 5
     result = list()
     for trial in range(number_trials):
-        best_ind = fitting_genetic3(actual_number_sick=number_sick)
+        best_ind = fitting_genetic_lockdown(actual_number_sick=number_sick)
         result.append(best_ind)
-        with open('parameter_genetic_overall_factor' + str(faktor_actual_cases) +'.txt', 'a') as f:
+        with open('parameter_genetic_overall_factor' + str(const.faktor_actual_cases) +'.txt', 'a') as f:
             f.write('Trial: ' + str(trial) + '\n')
             params = ['U_before', 't_before', 'V_before', 'U_after', 't_after', 'V_after', 'Fitness']
             for i in range(len(best_ind)):

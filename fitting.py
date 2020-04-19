@@ -30,8 +30,8 @@ def simulate_multi_scipy(x, U, t, V):
         V_array.append(V)
 
     number_processes = const.number_processes
-    numberDays = 34
-    n = 3.234375e-07
+    numberDays = len(U)
+    n = const.n
 
     poolarray = []
     for i in range(number_processes):
@@ -385,14 +385,14 @@ def fitting_genetic_lockdown(actual_number_sick, populationsize = 10, number_gen
 
     #save result:
     params = ['U_before', 't_before', 'V_before', 'U_after', 't_after', 'V_after', 'Fitness']
-    with open('parameter_genetic.txt', 'w') as f:
+    with open('parameter_genetic_tmp.txt', 'w') as f:
         for i in range(len(best_ind)):
             f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
 
     return best_ind
 
-# keeps the best individuals for the next generation
-def fitting_genetic_dev(actual_number_sick, populationsize=6, number_generations=7, time_lockdown=const.time_lockdown):
+# keeps the 10% best individuals for the next generation
+def fitting_genetic_lockdown_percent(actual_number_sick, populationsize=10, number_generations=3, time_lockdown=const.time_lockdown, percent = 0.05):
     def crossover(parent1, parent2):
         child1 = []
         child2 = []
@@ -502,6 +502,9 @@ def fitting_genetic_dev(actual_number_sick, populationsize=6, number_generations
     for gen in range(1, number_generations + 1):
         print('Generation: ' + str(gen))
         mating_pool = selection(population)
+        new_population = population.copy()
+        #keep only best 10% of population
+        new_population = sort_population(new_population)[:int(np.ceil(percent * populationsize))]
         for i in range(0, len(mating_pool), 2):
             parent1 = mating_pool[i]
             if (i + 1 < len(mating_pool)):
@@ -544,10 +547,10 @@ def fitting_genetic_dev(actual_number_sick, populationsize=6, number_generations
             child2[6] = fitness2
 
 
-            population.append(child1)
-            population.append(child2)
+            new_population.append(child1)
+            new_population.append(child2)
 
-        population = sort_population(population)
+        population = sort_population(new_population)
         population = population[:populationsize]
 
 
@@ -562,7 +565,7 @@ def fitting_genetic_dev(actual_number_sick, populationsize=6, number_generations
 
     # save result:
     params = ['U_before', 't_before', 'V_before', 'U_after', 't_after', 'V_after', 'Fitness']
-    with open('parameter_genetic.txt', 'w') as f:
+    with open('parameter_genetic_tmp.txt', 'w') as f:
         for i in range(len(best_ind)):
             f.write(params[i] + ': ' + str(best_ind[i]) + '\n')
 
@@ -603,9 +606,9 @@ def main():
     number_trials = 5
     result = list()
     for trial in range(number_trials):
-        best_ind = fitting_genetic_lockdown(actual_number_sick=number_sick)
+        best_ind = fitting_genetic_lockdown_percent(actual_number_sick=number_sick, percent=0.05)
         result.append(best_ind)
-        with open('parameter_genetic_overall_factor' + str(const.faktor_actual_cases) +'.txt', 'a') as f:
+        with open('parameter_genetic_overall_factor' + str(const.factor_actual_cases) +'.txt', 'a') as f:
             f.write('Trial: ' + str(trial) + '\n')
             params = ['U_before', 't_before', 'V_before', 'U_after', 't_after', 'V_after', 'Fitness']
             for i in range(len(best_ind)):

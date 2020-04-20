@@ -50,6 +50,7 @@ number_sick = np.asarray(number_sick_original) * factor_actual_cases
 number_immune = np.asarray(number_immune_original) * factor_actual_cases
 
 number_sick = number_sick / float(population_germany) * numPop
+number_immune = number_immune / float(population_germany) * numPop
 
 n = number_sick[0] / float(numPop)
 

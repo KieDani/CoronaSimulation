@@ -241,7 +241,7 @@ def simulation(U, t, V, n, numberDays, seed):
 
 
 def main():
-    numberDays = len(const.number_sick) + 5
+    numberDays = len(const.number_sick) + 165
     U = list()
     t = list()
     V = list()
@@ -249,10 +249,14 @@ def main():
         U.append(const.U_before)
         t.append(const.t_before)
         V.append(const.V_before)
-    for i in range(0, numberDays):
+    for i in range(const.time_lockdown, len(const.number_sick) + 10):
         U.append(const.U_after)
         t.append(const.t_after)
         V.append(const.V_after)
+    for i in range(len(const.number_sick) + 10, numberDays):
+        U.append(const.U_before)
+        t.append(const.t_before)
+        V.append(const.V_before)
     n = const.n
     number_processes = const.number_processes
 
@@ -273,11 +277,11 @@ def main():
     #print(np.asarray(arrayInfected[:len(const.number_sick)]) - np.asarray(const.number_sick))
 
 
-    plt.plot(arrayInfected, color='red')
-    #plt.plot(arrayImmune, color='green')
+    plt.plot(np.asarray(arrayInfected)/const.numPop, color='red')
+    plt.plot(np.asarray(arrayImmune)/const.numPop, color='green')
 
-    plt.plot(const.number_sick, color = 'darkred')
-    #plt.plot(const.number_immune, color = 'darkgreen')
+    plt.plot(const.number_sick/const.numPop, color = 'darkred')
+    plt.plot(const.number_immune/const.numPop, color = 'darkgreen')
 
     plt.show()
 
